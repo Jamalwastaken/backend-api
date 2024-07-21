@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import connexion
+from flask import jsonify
 
 from swagger_server import encoder
 from swagger_server.db import db
@@ -24,8 +25,21 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 def create_tables():
     db.create_all()
 
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        "code": error.code,
+        "name": error.name,
+        "description": error.description,
+    }), 400
 
-
+@app.errorhandler(404)
+def bad_request(error):
+    return jsonify({
+        "code": error.code,
+        "name": error.name,
+        "description": error.description,
+    }), 404
 
 if __name__ == '__main__':
     # with app.app_context():
