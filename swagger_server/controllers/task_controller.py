@@ -90,7 +90,13 @@ def find_tasks_by_status(status=None):  # noqa: E501
 
     :rtype: List[Task]
     """
-    return 'do some magic!'
+    if status == "incompleted":
+        tasks = Task.query.filter(Task.completed_at.is_(None)).all()
+    elif status == "completed":
+        tasks = Task.query.filter(Task.completed_at.isnot(None)).all()
+    else:
+        abort(400, "invalid status value")
+    return jsonify(tasks)
 
 
 def get_task_by_id(task_id):  # noqa: E501
