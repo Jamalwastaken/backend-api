@@ -29,6 +29,7 @@ class Task(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"))
 
 
+@dataclass
 class User(db.Model):
     __tablename__ = "user"
 
@@ -41,6 +42,7 @@ class User(db.Model):
     password = db.Column(db.String(20), nullable=False)
     username = db.Column(db.String(80), nullable=False, unique=True)
 
+@dataclass
 class Collaborator(db.Model):
     __tablename__ = "collaborator"
 
@@ -53,9 +55,10 @@ class Collaborator(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("task_id", "user_id", name="_task_user_uc")
+        UniqueConstraint("task_id", "user_id", name="_task_user_uc"),
     )
 
+@dataclass
 class Subtask(db.Model):
     __tablename__ = "subtask"
 
@@ -68,6 +71,6 @@ class Subtask(db.Model):
     child_task_id = db.Column(db.Integer, db.ForeignKey("task.task_id"), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint("parent_task_id", "child_task_id", name="_parent_child_uc")
+        UniqueConstraint("parent_task_id", "child_task_id", name="_parent_child_uc"),
     )
 
