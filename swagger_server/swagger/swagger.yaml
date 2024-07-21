@@ -559,7 +559,7 @@ components:
         completed_at:
           type: string
           format: date-time
-        author_id:
+        user_id:
           type: integer
       example:
         end_date: 2000-01-23T04:56:07.000+00:00
@@ -567,7 +567,7 @@ components:
         description: description
         task_id: 0
         title: title
-        author_id: 6
+        user_id: 6
         start_date: 2000-01-23T04:56:07.000+00:00
     User:
       type: object
