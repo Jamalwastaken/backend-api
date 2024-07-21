@@ -82,15 +82,13 @@ def delete_collaborator(task_id, user_id):  # noqa: E501
     return 'do some magic!'
 
 
-def delete_task(task_id, api_key=None):  # noqa: E501
+def delete_task(task_id):  # noqa: E501
     """Deletes a task
 
     delete a task # noqa: E501
 
     :param task_id: Task id to delete
     :type task_id: int
-    :param api_key: 
-    :type api_key: str
 
     :rtype: None
     """
