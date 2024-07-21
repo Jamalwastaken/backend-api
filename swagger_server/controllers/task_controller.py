@@ -1,7 +1,7 @@
 import connexion
 from flask import jsonify, abort
 
-from swagger_server.controllers.entities import Task
+from swagger_server.controllers.entities import Task, Subtask
 from swagger_server.db import db
 from swagger_server.models import CollaboratorInner
 
@@ -138,8 +138,36 @@ def getsub_task_by_id(task_id):  # noqa: E501
 
     :rtype: List[Task]
     """
-    return 'do some magic!'
+    tasks = Subtask.query.filter(Subtask.parent_task_id == task_id).all()
+    return jsonify(tasks)
 
+def add_subtask(task_id, body):  # noqa: E501
+    """Find subtask list
+
+    Returns a list of tasks # noqa: E501
+
+    :param task_id: ID of task to return
+    :type task_id: int
+
+    :rtype: List[Task]
+    """
+    response = add_task(body)
+    child_id = response.json.get('task_id')
+    subtask = Subtask(parent_task_id=task_id, child_task_id=child_id)
+    db.session.add(subtask)
+    db.session.commit()
+
+def delete_subtask(task_id, subtask_id):
+    delete_count = Subtask.query.filter(
+        Subtask.parent_task_id == task_id,
+        Subtask.child_task_id == subtask_id,
+    ).delete()
+    db.session.commit()
+    if delete_count == 0:
+        abort(404, "No subtasks found")
+    else:
+        _ = Task.query.filter(Task.task_id == task_id).delete()
+        db.session.commit()
 
 def update_task(task_id, body=None):  # noqa: E501
     """Updates a task

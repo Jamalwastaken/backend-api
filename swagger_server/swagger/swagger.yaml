@@ -239,6 +239,100 @@ paths:
         - write:tasks
         - read:tasks
       x-openapi-router-controller: swagger_server.controllers.task_controller
+    post:
+      tags:
+      - task
+      summary: Add a subtask
+      description: Add a subtask
+      operationId: add_subtask
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of task to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Create a new subtask
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Task'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Task'
+        "400":
+          description: Invalid input
+        "422":
+          description: Validation exception
+      security:
+      - api_key:
+        - write:tasks
+        - read:tasks
+      x-openapi-router-controller: swagger_server.controllers.task_controller
+  /task/{taskId}/subtask/{subtaskId}:
+    delete:
+      tags:
+        - task
+      summary: Delete a subtask
+      description: Delete a subtask
+      operationId: delete_subtask
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of task to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+        - name: subtaskId
+          in: path
+          description: ID of task to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Task'
+        "400":
+          description: Invalid input
+        "422":
+          description: Validation exception
+      security:
+        - api_key:
+            - write:tasks
+            - read:tasks
+      x-openapi-router-controller: swagger_server.controllers.task_controller
+
   /task/{taskId}/collaborator:
     get:
       tags:
