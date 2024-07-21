@@ -74,7 +74,10 @@ def delete_task(task_id):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    delete_count = Task.query.filter_by(task_id=task_id).delete()
+    db.session.commit()
+    if delete_count == 0:
+        abort(404, f"{task_id} not found")
 
 
 def find_tasks_by_status(status=None):  # noqa: E501
@@ -144,6 +147,21 @@ def update_task(task_id, body=None):  # noqa: E501
 
     :rtype: None
     """
-    if connexion.request.is_json:
-        body = Task.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    try:
+        if connexion.request.is_json:
+            d = connexion.request.get_json()
+            if "task_id" in d.keys():
+                d.pop("task_id")
+
+            task = Task.query.filter_by(task_id=task_id).first()
+            if task:
+                for key, value in d.items():
+                    setattr(task, key, value)
+                db.session.add(task)
+                db.session.commit()
+                return jsonify(task)
+    except Exception as e:
+        abort(400, str(e))
+
+    abort(404, f"{task_id} not found")
+
