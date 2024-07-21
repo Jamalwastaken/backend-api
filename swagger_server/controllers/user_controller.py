@@ -1,5 +1,6 @@
 import connexion
 import six
+from flask import jsonify, abort
 
 from swagger_server.controllers.entities import User
 from swagger_server.db import db
@@ -17,38 +18,19 @@ def create_user(body=None):  # noqa: E501
 
     :rtype: User
     """
-    if connexion.request.is_json:
-        #body = User.from_dict(connexion.request.get_json())  # noqa: E501
-        d = connexion.request.get_json()
-        email = d.get("email")
-        password = d.get("password")
-        username = d.get("username")
-        _create_user(username, email, password)
+    try:
+        if connexion.request.is_json:
+            #body = User.from_dict(connexion.request.get_json())  # noqa: E501
+            d = connexion.request.get_json()
+            if "user_id" in d.keys():
+                d.pop("user_id")
 
-    return 'do some magic!'
-
-
-def _create_user(username=None, email=None, password=None):  # noqa: E501
-    """Create user
-
-    This can only be done by the logged in user. # noqa: E501
-
-    :param user_id: 
-    :type user_id: int
-    :param username: 
-    :type username: str
-    :param email: 
-    :type email: str
-    :param password: 
-    :type password: str
-
-    :rtype: User
-    """
-    user = User(email=email, password=password, username=username)
-    db.session.add(user)
-    db.session.commit()
-    return 'do some magic!'
-
+            user = User(**d)
+            db.session.add(user)
+            db.session.commit()
+            return jsonify(user)
+    except Exception as e:
+        abort(400, str(e))
 
 def delete_user(username):  # noqa: E501
     """Delete user
@@ -73,7 +55,10 @@ def get_user_by_name(username):  # noqa: E501
 
     :rtype: User
     """
-    return 'do some magic!'
+    user= User.query.filter_by(username=username).first()
+    if not user:
+        abort(404, f"{username} not found")
+    return jsonify(user)
 
 
 def login_user(username=None, password=None):  # noqa: E501
