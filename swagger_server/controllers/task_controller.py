@@ -1,7 +1,7 @@
 import connexion
 from flask import jsonify, abort
 
-from swagger_server.controllers.entities import Task, Subtask
+from swagger_server.controllers.entities import Task, Subtask, Collaborator, User
 from swagger_server.db import db
 from swagger_server.models import CollaboratorInner
 
@@ -18,10 +18,14 @@ def add_collaborator(body, task_id):  # noqa: E501
 
     :rtype: Task
     """
-    if connexion.request.is_json:
-        body = [CollaboratorInner.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
-    return 'do some magic!'
-
+    collaborators = []
+    for d in connexion.request.get_json():
+        user_id = d.get("user_id")
+        collaborator = Collaborator(task_id=task_id, user_id=user_id)
+        collaborators.append(collaborator)
+        db.session.add(collaborator)
+        db.session.commit()
+    return jsonify(collaborators)
 
 def add_task(body):  # noqa: E501
     """Add a task
@@ -61,7 +65,12 @@ def delete_collaborator(task_id, user_id):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+    delete_count = Collaborator.query.filter_by(
+        task_id=task_id, user_id=user_id
+    ).delete()
+    if delete_count == 0:
+        abort(404, "Collaborator not found")
+    db.session.commit()
 
 
 def delete_task(task_id):  # noqa: E501
@@ -125,7 +134,8 @@ def get_task_collaborators(task_id):  # noqa: E501
 
     :rtype: List[User]
     """
-    return 'do some magic!'
+    collaborators = User.query.join(Collaborator).filter(Collaborator.task_id==task_id).all()
+    return jsonify(collaborators)
 
 
 def getsub_task_by_id(task_id):  # noqa: E501
