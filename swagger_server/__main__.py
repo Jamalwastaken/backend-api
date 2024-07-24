@@ -2,6 +2,7 @@
 
 import connexion
 from flask import jsonify
+from flask_cors import CORS
 
 from swagger_server import encoder
 from swagger_server.db import db
@@ -13,6 +14,7 @@ connex_app.app.json_encoder = encoder.JSONEncoder
 connex_app.add_api('swagger.yaml', arguments={'title': 'Swagger Petstore - OpenAPI 3.0'}, pythonic_params=True)
 
 app = connex_app.app
+CORS(app)
 
 username = "postgres"
 password = "1234"
